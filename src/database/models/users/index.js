@@ -10,7 +10,6 @@ const UserSchema = new Schema(
       type: String,
       required: [true, "last name required"],
     },
-
     joinAs: {
       type: String,
       required: [true, "join as required"],
