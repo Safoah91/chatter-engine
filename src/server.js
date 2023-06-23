@@ -5,6 +5,8 @@ const morgan = require("morgan");
 const errorHandler = require("./middleware/errorHandler");
 const connectDB = require("./database");
 const UserRoutes = require("./routes/users");
+const blogRoutes = require("./routes/blogs");
+const categoryRoutes = require("./routes/category");
 
 const app = express();
 connectDB();
@@ -19,7 +21,9 @@ app.get("/", (req, res) => {
   res.send("welcome here");
 });
 
-app.use("/api", UserRoutes);
+app.use("/api/auth", UserRoutes);
+app.use("/api/blogs", blogRoutes);
+app.use("/api/categories", categoryRoutes);
 
 app.listen(port, () => {
   console.log(`- server listening on port ${port}`);
