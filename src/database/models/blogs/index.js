@@ -4,8 +4,12 @@ const BlogsSchema = new Schema(
   {
     title: { type: String, required: [true, "title required"] },
     body: { type: String, required: [true, "blog content required"] },
-    published: { type: String },
+    isPublished: { type: Boolean, required: [true, 'published required']},
     publishedAt: { type: Date },
+    isDrafted: {type: Boolean, required: [true, "draft required"]},
+    draftedAt: {type: Date},
+    readTime: {type: String, required: [true, "read time required"]},
+    except: {type: String, required: [true, "except required"]},
     category: {
       type: mongoose.Types.ObjectId,
       ref: "category",
