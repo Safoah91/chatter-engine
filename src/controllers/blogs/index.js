@@ -1,14 +1,95 @@
 const BlogsModel = require("../../database/models/blogs");
 const asyncHandler = require("express-async-handler");
 
+/**
+ * @description Get All Blogs
+ * @route GET /api/blogs
+ * @access Public
+ */
 const blogs = asyncHandler(async (req, res) => {
   const blogs = await BlogsModel.find({});
   res.status(200).json(blogs);
 });
 
+/**
+ * @description Get Single Blog
+ * @route GET /api/blogs/blog/:id
+ * @access Public
+ */
+const singleBlog = asyncHandler(async(req, res) => {
+  const blogID = req.params.id;
+  
+  if(blog) {
+    res.status(401)
+    throw new Error('Blog ID not provided')
+  }
+
+  const blog = await BlogsModel.findOne({_id: blogID})
+
+  if(blog) {
+    res.status(200).json(blog)  
+  } else {
+    res.status(400)
+    throw new Error('Blog not found')
+  }
+})
 
 /**
- *
+ * @description Get All User Blogs
+ * @route GET /api/blogs/user-blogs
+ * @access Private
+ */
+const userBlogs = asyncHandler(async (req, res) => {
+  const user = req.user.id
+
+  if(!user) {
+    res.status(402)
+    throw new Error('Token not provided or invalid')
+  }
+
+  const blogs = await BlogsModel.find({userID: user});
+
+  if(blogs) {
+    res.status(200).json(blogs);
+  } else {
+    res.status(401)
+    throw new Error('User has no blogs created')
+  }
+});
+
+/**
+ * @description Get Single User Blog
+ * @route GET /api/blogs/user-blogs/blog/:id
+ * @access Private
+ */
+const singleUserBlog = asyncHandler(async(req, res) => {
+  const userID = req.user.id
+  const blogID = req?.query?.id
+
+  if(!userID) {
+    res.status(402)
+    throw new Error('Token not provided or invalid')
+  }
+
+  if(!blogID) {
+    res.status(402)
+    throw new Error('Blog ID not provided')
+  }
+
+  const blog = await BlogsModel.findOne({_id: blogID, userID: userID, });
+
+  if(blog) {
+    res.status(200).json(blog);
+  } else {
+    res.status(401)
+    throw new Error('Could not fetch single user blog')
+  }
+})
+
+/**
+ * @description Get All Blogs
+ * @route GET /api/blogs
+ * @access Public
  */
 const publishedBlogs = asyncHandler(async (req, res) => {
   const published = await BlogsModel.find({ isPublished: true});
@@ -21,27 +102,7 @@ const publishedBlogs = asyncHandler(async (req, res) => {
   }
 });
 
-const userBlogs = asyncHandler(async (req, res) => {
-  const user = req.user.id
 
-  const {userID} = req.query
-
-  if(!user) {
-    res.status(402)
-    throw new Error('Token not provided or invalid')
-  }
-
-  console.log(userID)
-
-  const blogs = await BlogsModel.find({userID: user});
-
-  if(blogs) {
-    res.status(200).json(blogs);
-  } else {
-    res.status(401)
-    throw new Error('User has no blogs created')
-  }
-});
 
 
 /**
@@ -88,4 +149,4 @@ const createBlog = asyncHandler(async (req, res) => {
     }
   });
 
-module.exports = { blogs, createBlog, publishedBlogs, draftedBlogs, userBlogs };
+module.exports = { blogs, singleBlog, singleUserBlog, createBlog, publishedBlogs, draftedBlogs, userBlogs };
