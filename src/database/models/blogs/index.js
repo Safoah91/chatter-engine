@@ -3,6 +3,7 @@ const { Schema, model, default: mongoose } = require("mongoose");
 const BlogsSchema = new Schema(
   {
     title: { type: String, required: [true, "title required"] },
+    featuredImage: {type: String, required: [true, "featured image required"]},
     body: { type: String, required: [true, "blog content required"] },
     isPublished: { type: Boolean, required: [true, 'published required']},
     publishedAt: { type: Date },
