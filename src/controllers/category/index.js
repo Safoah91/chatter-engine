@@ -10,6 +10,15 @@ const categories = asyncHandler(async (req, res) => {
 });
 
 const createCategory = asyncHandler(async (req, res) => {
+  const {title} = req.body
+
+  const checkTitle = await CategoryModel.findOne({title})
+
+  if(checkTitle) {
+    res.status(401)
+    throw new Error("Title already exists")
+  }
+  
   const newCategory = await CategoryModel.create({
     ...req.body,
   });
