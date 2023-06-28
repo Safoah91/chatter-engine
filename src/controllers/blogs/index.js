@@ -7,7 +7,7 @@ const asyncHandler = require("express-async-handler");
  * @access Public
  */
 const blogs = asyncHandler(async (req, res) => {
-  const blogs = await BlogsModel.find({});
+  const blogs = await BlogsModel.find({isPublished: true});
   res.status(200).json(blogs);
 });
 
@@ -17,10 +17,10 @@ const blogs = asyncHandler(async (req, res) => {
  * @access Public
  */
 const singleBlog = asyncHandler(async(req, res) => {
-  const blogID = req.params.id;
+  const blogID = req.query.id;
   
-  if(blog) {
-    res.status(401)
+  if(!blogID) {
+    res.status(404)
     throw new Error('Blog ID not provided')
   }
 
@@ -43,7 +43,7 @@ const userBlogs = asyncHandler(async (req, res) => {
   const user = req.user.id
 
   if(!user) {
-    res.status(402)
+    res.status(401)
     throw new Error('Token not provided or invalid')
   }
 
@@ -72,7 +72,7 @@ const singleUserBlog = asyncHandler(async(req, res) => {
   }
 
   if(!blogID) {
-    res.status(402)
+    res.status(404)
     throw new Error('Blog ID not provided')
   }
 
@@ -101,9 +101,6 @@ const publishedBlogs = asyncHandler(async (req, res) => {
     throw new Error("No published blogs");
   }
 });
-
-
-
 
 /**
  *
@@ -149,4 +146,33 @@ const createBlog = asyncHandler(async (req, res) => {
     }
   });
 
-module.exports = { blogs, singleBlog, singleUserBlog, createBlog, publishedBlogs, draftedBlogs, userBlogs };
+/**
+ *
+ */
+const updateBlog = asyncHandler(async (req, res) => {
+  const user = req.user.id
+  // const {id: blogID} = req.params
+  const blogID = req?.query?.id
+  const blog = await BlogsModel.findOne({_id: blogID})
+    
+    if(!user) {
+      res.status(402)
+      throw new Error('Token not provided or invalid')
+    }
+
+    if(!blogID) {
+      res.status(404)
+      throw new Error("Blog ID not provided")
+    }
+  
+    const updateNewBlog = await BlogsModel.findByIdAndUpdate({_id: blogID, new: true});
+  
+    if (updateNewBlog) {
+      res.status(202).json({ message: "blog updated successfully" });
+    } else {
+      res.status(401);
+      throw new Error("Unable to update blog");
+    }
+  });
+
+module.exports = { blogs, singleBlog, singleUserBlog, createBlog, publishedBlogs, draftedBlogs, userBlogs, updateBlog };
